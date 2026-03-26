@@ -93,8 +93,7 @@ public class GameManager : MonoBehaviour
         }
         else if (cpus.Length == 0)
         {
-            if (countText != null) countText.text = "YOU WIN!";
-            Invoke("RestartGame", 3f);
+            SceneManager.LoadScene("STAGECLEAR");//ステージクリア
         }
     }
 
