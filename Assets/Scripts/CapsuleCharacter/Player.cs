@@ -1,11 +1,10 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class Player : MonoBehaviour
 {
     public float moveSpeed = 7.0f;
     private Rigidbody rb;
     private Vector3 moveInput;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -22,7 +21,8 @@ public class PlayerMovement : MonoBehaviour
         moveInput = new Vector3(moveX, 0, moveZ).normalized;
     }
 
-    void FixedUpdate(){
+    void FixedUpdate()
+    {
         //ゲームが始まっていないなら何もしない（止まる）
         if (GameManager.instance != null && !GameManager.instance.isGameStarted)
         {
@@ -32,10 +32,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         Debug.Log("現在の入力: " + moveInput);//デバッグ
-       //物理演算を使って移動させる
-       rb.linearVelocity = moveInput * moveSpeed;
+                                         //物理演算を使って移動させる
+        rb.linearVelocity = moveInput * moveSpeed;
         /*Vector3 velocity = moveInput * moveSpeed;
         velocity.y = rb.linearVelocity.y; 
         rb.linearVelocity = velocity;*/
     }
+
+
 }

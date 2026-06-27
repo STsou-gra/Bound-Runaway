@@ -38,28 +38,28 @@ public class Cannon : MonoBehaviour
     {
         while (true)
         {
-        yield return new WaitForSeconds(fireInterval);
+            yield return new WaitForSeconds(fireInterval);
 
-        // 1. 生成（firePointの位置に出す）
-        GameObject line = Instantiate(linePrefab, firePoint.position, barrelGroup.rotation);
-        
-        // 2. 砲身の子にする（これで一緒に回る）
-        line.transform.SetParent(barrelGroup);
-        Debug.Log($"[Indicator生成] 名前: {line.name}, 位置: {line.transform.localPosition}, 親: {line.transform.parent.name}");
+            // 生成（firePointの位置に出す）
+            GameObject line = Instantiate(linePrefab, firePoint.position, barrelGroup.rotation);
 
-        // 3. 【重要】向きだけをリセットし、位置はfirePointの場所に固定
-        // これで、Indicatorプレハブ内で「前」にずらした分だけ先端から伸びます
-        //line.transform.localPosition = firePoint.localPosition;
-        line.transform.localRotation = Quaternion.identity;
-        // FirePointの座標に、Indicatorの長さの半分(5.0など)を足して設定する
-        float offsetZ = line.transform.localScale.z * 0.5f; // Indicator(Cylinder)の長さが10ならその半分を代入
-        line.transform.localPosition = new Vector3(
-        firePoint.localPosition.x, 
-        firePoint.localPosition.y + 0.1f, //y座標はCylinder部分に合わせる
-        offsetZ 
-);
+            // 砲身の子にする（これで一緒に回る）
+            line.transform.SetParent(barrelGroup);
+            Debug.Log($"[Indicator生成] 名前: {line.name}, 位置: {line.transform.localPosition}, 親: {line.transform.parent.name}");
 
-        Debug.Log($"[Indicator上書き後] 位置: {line.transform.localPosition}, 回転: {line.transform.localEulerAngles}");
+            // 向きだけをリセットし、位置はfirePointの場所に固定
+            // これで、Indicatorプレハブ内で「前」にずらした分だけ先端から伸びます
+            //line.transform.localPosition = firePoint.localPosition;
+            line.transform.localRotation = Quaternion.identity;
+            // FirePointの座標に、Indicatorの長さの半分(5.0など)を足して設定する
+            float offsetZ = line.transform.localScale.z * 0.5f; // Indicator(Cylinder)の長さが10ならその半分を代入
+            line.transform.localPosition = new Vector3(
+            firePoint.localPosition.x,
+            firePoint.localPosition.y + 0.1f, //y座標はCylinder部分に合わせる
+            offsetZ
+    );
+
+            Debug.Log($"[Indicator上書き後] 位置: {line.transform.localPosition}, 回転: {line.transform.localEulerAngles}");
             float t = 0;
             while (t < 2.0f)
             {
@@ -81,7 +81,7 @@ public class Cannon : MonoBehaviour
 
         // 2. ボールを生成（1回だけ！）
         GameObject ball = Instantiate(ballPrefab, firePoint.position, Quaternion.identity);
-        
+
         // 3. 必要なコンポーネントを取得
         Rigidbody rb = ball.GetComponent<Rigidbody>();
         Ball ballScript = ball.GetComponent<Ball>();

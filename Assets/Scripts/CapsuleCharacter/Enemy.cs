@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class CPUAvoidance : MonoBehaviour
+public class Enemy : MonoBehaviour
 {
     public float wanderSpeed = 4.0f;  // 普段のうろうろ
     public float escapeSpeed = 5.5f;  // 逃げる時（あまり速すぎないように）
-    public float detectRange = 4.0f;  // 【重要】これを短くすると当たりやすくなる
+    public float detectRange = 4.0f;  // これを短くすると当たりやすくなる
     public float wanderInterval = 1.5f;
 
     private Transform ballTarget; // 一番近いボールを狙う

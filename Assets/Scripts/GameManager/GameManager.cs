@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
-using System.Collections; // コルーチンに必要
+using System.Collections;
+using Unity.VisualScripting; // コルーチンに必要
 
 public class GameManager : MonoBehaviour
 {
@@ -9,12 +10,12 @@ public class GameManager : MonoBehaviour
 
     [Header("UI設定")]
     public TextMeshProUGUI countText;       // 残り人数用
-    public TextMeshProUGUI countdownText;   // ★カウントダウン用
+    public TextMeshProUGUI countdownText;   // カウントダウン用
 
 
-    public bool isGameStarted = false; // ★ゲーム開始フラグ
+    public bool isGameStarted = false; // ゲーム開始フラグ
 
-    void Awake()
+    protected virtual void Awake()
     {
         if (instance == null) instance = this;
     }
@@ -22,9 +23,16 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         UpdateCharacterCount();
-        StartCoroutine(CountdownRoutine()); // ★カウントダウン開始
+        StartCoroutine(CountdownRoutine()); // カウントダウン開始
     }
 
+    /* スタート時の処理（子クラスで変更可能） */
+    protected virtual void OnStart()
+    {
+        UpdateCharacterCount();
+    }
+
+    /*スタート時のカウントダウン*/
     IEnumerator CountdownRoutine()
     {
         isGameStarted = false; // 最初は動けない
@@ -42,20 +50,14 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
 
         countdownText.text = "START!";
-        isGameStarted = true; // ★ここで全員動けるようになる
+        isGameStarted = true; // ここで全員動けるようになる
 
         yield return new WaitForSeconds(1.0f);
         countdownText.gameObject.SetActive(false); // テキストを消す
     }
 
-    void Update()
-    {
-    }
-
-    // --- 以下、既存のUpdateCharacterCount, SpawnNewBall, CheckGameOverなどはそのまま ---
-    // ※ CheckGameOver の中の RestartGame などの処理は以前のままでOKです。
-    
-    public void UpdateCharacterCount()
+    /*残りカプセル数カウント（左上に出ている残り人数）*/
+    public virtual void UpdateCharacterCount()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject[] cpus = GameObject.FindGameObjectsWithTag("CPU");
@@ -63,17 +65,24 @@ public class GameManager : MonoBehaviour
         if (countText != null) countText.text = "SURVIVORS: " + totalCount;
     }
 
-    public void CheckGameOver()
+    /*ゲームオーバーチェック（子クラスでの上書き・変更可能）*/
+    public virtual void CheckGameOver()
     {
-        Invoke("UpdateCharacterCount", 0.1f);
-        Invoke("CountRemainingCharacters", 0.15f);
+        StartCoroutine(CheckGameOverRoutine());
     }
 
+    protected virtual IEnumerator CheckGameOverRoutine()
+    {
+        yield return new WaitForSecondsRealtime(0.15f);
+        UpdateCharacterCount();
+        CountRemainingCharacters();
+    }
+
+    /*ヒットストップ（共通）*/
     public void HitStop()
     {
         StartCoroutine(HitStopRoutine());
     }
-
     IEnumerator HitStopRoutine()
     {
         Time.timeScale = 0.05f;
@@ -81,7 +90,8 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1.0f;
     }
 
-    void CountRemainingCharacters()
+    /* カプセルが撃破された際の処理（ゲームオーバーやゲームクリア管理など）*/
+    protected virtual void CountRemainingCharacters()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject[] cpus = GameObject.FindGameObjectsWithTag("CPU");
@@ -93,11 +103,12 @@ public class GameManager : MonoBehaviour
         }
         else if (cpus.Length == 0)
         {
-            SceneManager.LoadScene("STAGECLEAR");//ステージクリア
+            SceneManager.LoadScene("StageClear");//ステージクリア
         }
     }
 
-    void RestartGame()
+    /*プレイヤーがゲームオーバーになった際、元ステージからやり直す*/
+    protected void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
